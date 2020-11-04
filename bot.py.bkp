@@ -1,0 +1,100 @@
+# https://github.com/Rapptz/discord.py/blob/async/examples/reply.py
+import os
+import discord
+import asyncio
+import platform
+#import valve.rcon
+import mcrcon
+from discord.ext import commands
+from discord.ext.commands import Bot
+
+TOKEN = "NDcyMjA4NzM4NjYxNDMzMzQ1.DjwC2Q.6luhJbgkN1NjAUBxr0Yn5-82DFI"
+
+#client = discord.Client()
+
+####################################################################################
+# Set the bot's prefix, description and wether it sends help in direct messages or not.
+client = Bot(description="giblet", command_prefix="-", pm_help = True)
+
+d = {}
+with open("servers.txt") as f:
+    for line in f:
+       key, *val = line.split()
+       d[str(key)] = val
+
+# Post a message in the game server
+@client.command()
+async def say(server, message):
+	v = d.get(server)
+	if v is not None:
+		address = (v[0], int(v[1]))
+		password = v[2]
+		
+		with valve.rcon.RCON(address, password) as rcon:
+			response = rcon.execute("say " + message)
+		print(response.text)
+
+		await client.say("Your message was published in " + server)
+		await client.say("Your message: " + message)
+	else:
+		await client.say(server + " does not exist in your server list.")
+
+## Allow the user to enter custom server commands
+@client.command()
+async def cmd(server, command):
+	v = d.get(server)
+	if v is not None:
+		address = (v[0], int(v[1]))
+		password = v[2]
+
+		with valve.rcon.RCON(address, password) as rcon:
+			response = rcon.execute(command)
+		print(response.text)
+
+		await client.say("Your command was executed on " + server + ".")
+	else:
+		await client.say(server + " does not exist in your server list.")
+####################################################################################
+	
+@client.event
+async def on_message(message):
+	# we do not want the bot to reply to itself
+	if message.author == client.user:
+		return
+
+	if message.content.startswith('gb ping'):
+		msg = 'Oh my God. Fuck off, {0.author.mention}.'.format(message)
+		await client.send_message(message.channel, msg)
+
+	if message.content.startswith('gb echo'):
+		msg = message.content
+		await client.send_message(message.channel, msg)
+
+	if message.content.startswith('gb help'):
+		msg = "There's no help to offer.  Fuck off.\nhttps://giphy.com/gifs/QGzPdYCcBbbZm"
+		msg2 = "Also, I'm touching myself right now, and you cannot un-know that."
+		await client.send_message(message.author, msg)
+		await client.send_message(message.author, msg2)
+
+#	if message.content.startswith('!rc'):
+#		v = d.get(server)
+#		if v is not None:
+#			address = (v[0], int(v[1]))
+#			password = v[2]
+#
+#			with valve.rcon.RCON(address, password) as rcon:
+#				response = rcon.execute(command)
+#			print(response.text)
+#
+#			await client.say("Your command was executed on " + server + ".")
+#		else:
+#			await client.say(server + " does not exist in your server list.")
+
+@client.event
+async def on_ready():
+	await client.change_presence(game=discord.Game(name='Screams [gb help]', type=2))
+	print('-------------------')
+	print('Logged in as',client.user.name)
+	print('-------------------')
+
+client.run(TOKEN)
