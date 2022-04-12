@@ -1,3 +1,0 @@
-prm localhost 1243 Psx300ctf
-snp localhost 1244 Psx300ctf
-atl localhost 1245 Psx300ctf

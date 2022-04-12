@@ -1,15 +1,13 @@
-import os
 import discord
+import os
 import asyncio
-import platform
+#import platform
 #import mcrcon
-from discord.ext import commands
-from discord.ext.commands import Bot
-
-TOKEN = "NDcyMjA4NzM4NjYxNDMzMzQ1.W1pwqA.H0-nE4NW8JHQfUvioElIxtCgtHc"
+#from discord.ext import commands
+#from discord.ext.commands import Bot
 
 #client = discord.Client()
-client = Bot(description="giblet", command_prefix="-", pm_help = False)
+client = discord.Client(description="giblet", command_prefix="-", pm_help = False)
 
 @client.event
 async def on_message(message):
@@ -36,7 +34,12 @@ async def on_ready():
 	game = discord.Game("Dicking about")
 	await client.change_presence(status=discord.Status.idle, activity=game)
 	print('-------------------')
-	print('Logged in as',client.user.name)
+	print('Logged in as {0.user}'.format(client))
+  #print('Logged in as',client.user.name)
 	print('-------------------')
 
-client.run(TOKEN)
+#@client.event
+#async def on_ready():
+#	print('Logged in as {0.user}'.format(client))
+
+client.run(os.getenv('TOKEN'))
